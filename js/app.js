@@ -1,3 +1,4 @@
+'use strict';
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -25,9 +26,8 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-    // Check that no collision is occurring while moving an enemy
-    // Collision points are the player's x position +/- 50 and enemies y positions (52, 134, 216) 
-    if (!(this.x <= player.x + 50 && this.x >= player.x - 50 && this.y == player.y)) {
+
+    if (!this.checkCollision()) {
         if (this.x > 505) {
             this.x = 0;
         } else {
@@ -39,6 +39,13 @@ Enemy.prototype.update = function(dt) {
     }
 };
 
+// Check that no collision is occurring while moving an enemy
+// Collision points are the player's x position +/- 50 and enemies y positions (52, 134, 216) 
+Enemy.prototype.checkCollision = function() {
+    if ((this.x <= player.x + 50 && this.x >= player.x - 50 && this.y == player.y)) 
+        return true;
+    return false;
+}
 
 
 // Draw the enemy on the screen, required method for game
@@ -59,18 +66,18 @@ var Player = function() {
     this.newY = 0;
     this.score = 0;
     this.collision = false;
-    this.lives = ['images/Heart.png', 'images/Heart.png', 'images/Heart.png'];
+    this.lives = 3;
 
 };
 
 // Checks collision with enemies
 Player.prototype.update = function() {
-    for (var i = 0; i < allEnemies.length; i++) {
-        if(allEnemies[i].x <= this.x + 50 && allEnemies[i].x >= this.x - 50 && allEnemies[i].y == this.y){
-            player.collision = true;
-            player.reset();
-        }
-    }
+    // for (var i = 0; i < allEnemies.length; i++) {
+    //     if(allEnemies[i].checkCollision()){
+    //         this.collision = true;
+    //         this.reset();
+    //     }
+    // }
 };
 
 // Resets the player position to the starting position
@@ -85,13 +92,13 @@ Player.prototype.reset = function() {
     this.newY = 0;
     if (!this.collision) {
         this.score += 1;
-    } else if (this.lives.length > 1 && this.collision) {
-        this.lives.splice(0, 1);
+    } else if (this.lives > 1 && this.collision) {
+        this.lives -= 1;
         this.collision = false;
     } else {
         this.score = 0;
         this.collision = false;
-        this.lives = ['images/Heart.png', 'images/Heart.png', 'images/Heart.png'];
+        this.lives = 3;
     }
 };
 
@@ -104,8 +111,8 @@ Player.prototype.render = function() {
 
     var x = 450;
     var y = 520;
-    for (var i = 0; i < this.lives.length; i++) {
-        ctx.drawImage(Resources.get(this.lives[i]), x, y, 50, 70);
+    for (var i = 0; i < this.lives; i++) {
+        ctx.drawImage(Resources.get('images/Heart.png'), x, y, 50, 70);
         x = x - 50;
     }
 };
